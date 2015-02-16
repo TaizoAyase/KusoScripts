@@ -1,0 +1,106 @@
+BASEDIR <topdir>
+
+NDATASET 1
+
+USE_QSUB 1
+
+# Param recycling
+CYCLE 2
+
+##########
+
+SET 1
+PREFIX col%d
+IMG_TMPL  ../data/col%d_000???.img
+IMG_RANGE 1 120
+RES_HI 2.0
+RES_LO 50
+
+#Settings to optimize
+K_SPOT_RANGE 1,10 1,20 1,30
+
+# SET 2
+
+RESET
+
+##########
+
+XDS_TMPL <<=====
+! written by generate_XDS.INP version 0.36 (12-June-2013)
+JOB= XYCORR INIT COLSPOT IDXREF DEFPIX INTEGRATE CORRECT
+
+ORGX= 1436.8 ORGY= 1409.7  ! check these values with adxv !
+
+DETECTOR_DISTANCE= 199.9
+OSCILLATION_RANGE= 1.5
+X-RAY_WAVELENGTH= 1.45000                      
+
+NAME_TEMPLATE_OF_DATA_FRAMES=@IMG_TMPL@
+
+! REFERENCE_DATA_SET=xxx/XDS_ASCII.HKL ! e.g. to ensure consistent indexing  
+DATA_RANGE=@IMG_RANGE@
+! SPOT_RANGE=1 60                                                     
+! BACKGROUND_RANGE=1 10 ! rather use defaults (first 5 degree of rotation)   
+
+SPACE_GROUP_NUMBER=19
+UNIT_CELL_CONSTANTS=57 86 96 90 90 90 ! put correct values if known
+
+INCLUDE_RESOLUTION_RANGE=@RES_RANGE@
+
+! IDXREF now obeys INCLUDE_RESOLUTION_RANGE and EXCLUDE_RESOLUTION_RANGE to exclude ice-rings
+
+FRIEDEL'S_LAW=FALSE     ! This acts only on the CORRECT step
+! If the anom signal turns out to be, or is known to be, very low or absent,
+! use FRIEDEL'S_LAW=TRUE instead (or comment out the line); re-run CORRECT
+
+! remove the "!" in the following line:
+STRICT_ABSORPTION_CORRECTION=TRUE
+! if the anomalous signal is strong: in that case, in CORRECT.LP the three
+! "CHI^2-VALUE OF FIT OF CORRECTION FACTORS" values are significantly> 1, e.g. 1.5
+!
+! exclude (mask) untrusted areas of detector, e.g. beamstop shadow :
+! UNTRUSTED_RECTANGLE= 1800 1950 2100 2150 ! x-min x-max y-min y-max ! repeat
+! UNTRUSTED_ELLIPSE= 2034 2070 1850 2240 ! x-min x-max y-min y-max ! if needed
+! UNTRUSTED_QUADRILATERAL= x1 y1 x2 y2 x3 y3 x4 y4 ! see documentation
+!
+! parameters with changes wrt default values:
+TRUSTED_REGION=0.00 1.2  ! partially use corners of detectors; 1.41421=full use
+VALUE_RANGE_FOR_TRUSTED_DETECTOR_PIXELS=6000. 30000. ! often 7000 or 8000 is ok
+STRONG_PIXEL=4           ! COLSPOT: only use strong reflections (default is 3)
+MINIMUM_NUMBER_OF_PIXELS_IN_A_SPOT=3 ! default of 6 is sometimes too high
+! close spots: reduce SEPMIN and CLUSTER_RADIUS from their defaults of 6 and 3, e.g. to 4 and 2
+! for bad or low resolution data remove the "!" in the following line: 
+REFINE(IDXREF)=CELL BEAM ORIENTATION AXIS ! DISTANCE
+REFINE(INTEGRATE)= DISTANCE BEAM ORIENTATION ! AXIS CELL
+! REFINE(CORRECT)=CELL BEAM ORIENTATION AXIS DISTANCE ! Default is: refine everything
+
+! parameters specifically for this detector and beamline:
+DETECTOR= CCDCHESS MINIMUM_VALID_PIXEL_VALUE= 1 OVERLOAD= 65500
+SENSOR_THICKNESS= 0.01
+! attention CCD detectors: for very high resolution (better than 1A) make sure to specify SILICON
+! as about 32* what CORRECT.LP suggests (absorption of phosphor is much higher than that of silicon)
+! NX= 3072 NY= 3072  QX= .0732420000  QY= .0732420000 ! to make CORRECT happy if frames are unavailable
+NX= 2880 NY= 2880  QX= .0782000000  QY= .0782000000 ! to make CORRECT happy if frames are unavailable
+
+ROTATION_AXIS=-1 0 0  ! if this is wrong, please contact author.
+DIRECTION_OF_DETECTOR_X-AXIS=1 0 0
+DIRECTION_OF_DETECTOR_Y-AXIS=0 1 0
+INCIDENT_BEAM_DIRECTION=0 0 1
+FRACTION_OF_POLARIZATION=0.98   ! better value is provided by beamline staff!
+POLARIZATION_PLANE_NORMAL=0 1 0
+!used by DEFPIX and CORRECT to exclude ice-reflections / ice rings - uncomment if necessary
+!EXCLUDE_RESOLUTION_RANGE= 3.93 3.87 !ice-ring at 3.897 Angstrom
+!EXCLUDE_RESOLUTION_RANGE= 3.70 3.64 !ice-ring at 3.669 Angstrom
+!EXCLUDE_RESOLUTION_RANGE= 3.47 3.41 !ice-ring at 3.441 Angstrom
+!EXCLUDE_RESOLUTION_RANGE= 2.70 2.64 !ice-ring at 2.671 Angstrom
+!EXCLUDE_RESOLUTION_RANGE= 2.28 2.22 !ice-ring at 2.249 Angstrom
+!EXCLUDE_RESOLUTION_RANGE= 2.102 2.042 !ice-ring at 2.072 Angstrom - strong
+!EXCLUDE_RESOLUTION_RANGE= 1.978 1.918 !ice-ring at 1.948 Angstrom - weak
+!EXCLUDE_RESOLUTION_RANGE= 1.948 1.888 !ice-ring at 1.918 Angstrom - strong
+!EXCLUDE_RESOLUTION_RANGE= 1.913 1.853 !ice-ring at 1.883 Angstrom - weak
+!EXCLUDE_RESOLUTION_RANGE= 1.751 1.691 !ice-ring at 1.721 Angstrom - weak
+
+=====
+
+
+
